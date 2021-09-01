@@ -12,6 +12,7 @@ using Crypto_Payment_Gateway.Models.DbModels;
 using Crypto_Payment_Gateway.Models.DbModels.Enums;
 using Crypto_Payment_Gateway.Models.Enums;
 using Crypto_Payment_Gateway.Models.InternalModels;
+using System.Globalization;
 
 namespace Crypto_Payment_Gateway.Services
 {
@@ -282,7 +283,7 @@ namespace Crypto_Payment_Gateway.Services
             return count;
         }
 
-        public async Task AddWalletTransactions(DateTime startDate,Currency currency)
+        public async Task<ICollection<WalletTransaction>> AddWalletTransactions(DateTime startDate,Currency currency)
         {
             DateTime endTime = DateTime.Now;
             ICollection<WalletTransaction> walletTransactions;
@@ -290,7 +291,7 @@ namespace Crypto_Payment_Gateway.Services
 
             if(currency == Currency.USDTerc20)
             {
-                walletTransactions =await GetUSDTerc20Transactions(startDate, wallets, endTime);
+                walletTransactions =await GetUSDTerc20Transactions( wallets);
             }
             else if(currency == Currency.USDTtrc20)
             {
@@ -302,43 +303,87 @@ namespace Crypto_Payment_Gateway.Services
             }
             else
             {
-                return;
+                return null;
             }
+            return walletTransactions;
         }
         
-        private async Task<ICollection<WalletTransaction>> GetUSDTerc20Transactions(DateTime startTime,ICollection<Wallet> wallets,DateTime endTime)
+        private async Task<ICollection<WalletTransaction>> GetUSDTerc20Transactions(ICollection<Wallet> wallets)
         {
             ICollection<WalletTransaction> walletTransactions = new List<WalletTransaction>();
 
-            //data that need to be past to api
-            string jsonObject = "";
-            string url = "";
-            //object should change to model of response
-            Object result;
-
-
-            try
+            foreach(Wallet wallet in wallets)
             {
-                using (HttpClient client = new HttpClient())
+
+                //data that need to be past to api ofset need to be set by admin or something like that 
+                string contractaddress = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+                string address = wallet.WalletAddress;
+                string offset = "100";
+                string apikey = "PBG73NEUGH6EKGCUZBTURPSY4TR69CVSW4";
+
+                string url = $"https://api.etherscan.io/api?module=account&action=tokentx&contractaddress={contractaddress}&address={address}&page=1&offset={offset}&sort=asc&apikey={apikey}";
+
+                //object should change to model of response
+
+
+                EthJsonRespons results = new EthJsonRespons();
+
+
+                try
                 {
-                    var content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
-                    var response = await client.GetAsync(url);
-                    if (response != null)
+                    using (HttpClient client = new HttpClient())
                     {
-                        var jsonString = await response.Content.ReadAsStringAsync();
-                        result = JsonConvert.DeserializeObject<object>(jsonString);
+                        char[] ar = { ' ', '\n' };
+                        url = url.Trim(ar);
+                        //var content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+                        var response = await client.GetAsync(url.Trim());
+                        if (response != null)
+                        {
+                            var jsonString = await response.Content.ReadAsStringAsync();
+                            results = JsonConvert.DeserializeObject<EthJsonRespons>(jsonString);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex.Message);
+                }
+                foreach (EthJsonRespons.TransactionsEth transactionsEth in results.result)
+                {
+
+                    WalletTransaction walletTransaction = new();
+                    walletTransaction.Wallet = db.Wallets.Where(x => x.WalletAddress == transactionsEth.to).FirstOrDefault();
+                    //check for duplicated transactions and invalid wallets
+                    if (walletTransaction.Wallet != null && !db.WalletTransactions.Any(x => x.Hash == transactionsEth.hash) && walletTransactions.Any(x => x.Hash == transactionsEth.hash))
+                    {
+                        walletTransaction.Ammount = float.Parse(transactionsEth.value, CultureInfo.InvariantCulture.NumberFormat) / 1000000;
+                        walletTransaction.Currency = Currency.USDTerc20;
+                        //for other tokens and coins is has to be change and get from some kind of api
+                        walletTransaction.ExchangeRateToUsd = 1;
+                        walletTransaction.Hash = transactionsEth.hash;
+                        //confirmation is 10 and need to be set by admin
+                        walletTransaction.IsConfirmed = int.Parse(transactionsEth.confirmations) > 10 ? true : false;
+                        walletTransaction.OtherAddress = transactionsEth.from;
+                        walletTransaction.WalletTransactionType = WalletTransactionType.UserDeposit;
+                        walletTransaction.TransactionDate = UnixTimeStampToDateTime(double.Parse(transactionsEth.timeStamp));
+
+                        walletTransactions.Add(walletTransaction);
+                        db.WalletTransactions.Add(walletTransaction);
+                    }
+
+                }
+
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex.Message);
-            }
+
+
+            //add all the valid transaction that been confirmed by 10 
+            await db.SaveChangesAsync(true);
             //need to create walletTransaction for each object that is recived
             return walletTransactions;
 
 
         }
+
         private async Task<ICollection<WalletTransaction>> GetUSDTtrc20Transactions(DateTime startTime, ICollection<Wallet> wallets, DateTime endTime)
         {
             ICollection<WalletTransaction> walletTransactions = new List<WalletTransaction>();
@@ -372,6 +417,7 @@ namespace Crypto_Payment_Gateway.Services
 
 
         }
+
         private async Task<ICollection<WalletTransaction>> GetBUSDbep2Transactions(DateTime startTime, ICollection<Wallet> wallets, DateTime endTime)
         {
             ICollection<WalletTransaction> walletTransactions = new List<WalletTransaction>();
@@ -404,6 +450,21 @@ namespace Crypto_Payment_Gateway.Services
             return walletTransactions;
 
 
+        }
+
+        public async Task AddWallet(Wallet wallet)
+        {
+            
+            await db.Wallets.AddAsync(wallet);
+            await db.SaveChangesAsync(true);
+        }
+
+        private static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dateTime;
         }
 
     }

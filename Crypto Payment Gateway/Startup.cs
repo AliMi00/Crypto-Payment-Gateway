@@ -105,6 +105,7 @@ namespace Crypto_Payment_Gateway
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }

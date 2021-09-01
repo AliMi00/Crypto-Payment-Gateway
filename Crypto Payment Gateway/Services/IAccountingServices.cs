@@ -52,6 +52,10 @@ namespace Crypto_Payment_Gateway.Services
 
         public Task<int> CheckingWaitingWalletTransaction(bool IsInMainWallet, DateTime startedTime, DateTime endTime, bool IsDeleted = false, SiteUser siteUser = null);
 
+        public Task AddWallet(Wallet wallet);
+
+        public Task<ICollection<WalletTransaction>> AddWalletTransactions(DateTime startDate, Currency currency);
+
 
 
     }
