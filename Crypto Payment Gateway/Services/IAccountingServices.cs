@@ -54,7 +54,7 @@ namespace Crypto_Payment_Gateway.Services
 
         public Task AddWallet(Wallet wallet);
 
-        public Task<ICollection<WalletTransaction>> AddWalletTransactions(DateTime startDate, Currency currency);
+        public Task<ICollection<WalletTransaction>> AddWalletTransactions(Currency currency);
 
 
 

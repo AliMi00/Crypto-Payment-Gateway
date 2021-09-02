@@ -283,7 +283,7 @@ namespace Crypto_Payment_Gateway.Services
             return count;
         }
 
-        public async Task<ICollection<WalletTransaction>> AddWalletTransactions(DateTime startDate,Currency currency)
+        public async Task<ICollection<WalletTransaction>> AddWalletTransactions(Currency currency )
         {
             DateTime endTime = DateTime.Now;
             ICollection<WalletTransaction> walletTransactions;
@@ -291,15 +291,15 @@ namespace Crypto_Payment_Gateway.Services
 
             if(currency == Currency.USDTerc20)
             {
-                walletTransactions =await GetUSDTerc20Transactions( wallets);
+                walletTransactions =await GetUSDTerc20Transactions(wallets);
             }
             else if(currency == Currency.USDTtrc20)
             {
-                walletTransactions = await GetUSDTtrc20Transactions(startDate, wallets, endTime);
+                walletTransactions = await GetUSDTtrc20Transactions(wallets);
             }
             else if (currency == Currency.BUSDbep2)
             {
-                walletTransactions = await GetBUSDbep2Transactions(startDate, wallets, endTime);
+                walletTransactions = await GetBUSDbep2Transactions(wallets);
             }
             else
             {
@@ -384,7 +384,7 @@ namespace Crypto_Payment_Gateway.Services
 
         }
 
-        private async Task<ICollection<WalletTransaction>> GetUSDTtrc20Transactions(DateTime startTime, ICollection<Wallet> wallets, DateTime endTime)
+        private async Task<ICollection<WalletTransaction>> GetUSDTtrc20Transactions( ICollection<Wallet> wallets)
         {
             ICollection<WalletTransaction> walletTransactions = new List<WalletTransaction>();
 
@@ -418,7 +418,7 @@ namespace Crypto_Payment_Gateway.Services
 
         }
 
-        private async Task<ICollection<WalletTransaction>> GetBUSDbep2Transactions(DateTime startTime, ICollection<Wallet> wallets, DateTime endTime)
+        private async Task<ICollection<WalletTransaction>> GetBUSDbep2Transactions( ICollection<Wallet> wallets)
         {
             ICollection<WalletTransaction> walletTransactions = new List<WalletTransaction>();
 
@@ -454,7 +454,6 @@ namespace Crypto_Payment_Gateway.Services
 
         public async Task AddWallet(Wallet wallet)
         {
-            
             await db.Wallets.AddAsync(wallet);
             await db.SaveChangesAsync(true);
         }
