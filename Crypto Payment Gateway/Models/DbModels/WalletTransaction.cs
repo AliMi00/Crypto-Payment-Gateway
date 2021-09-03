@@ -18,11 +18,7 @@ namespace Crypto_Payment_Gateway.Models.DbModels
         public DateTime TransactionDate { get; set; }
         public bool IsConfirmed { get; set; }
         public float ExchangeRateToUsd { get; set; }
-
-
-
-
-
+        public bool IsAddedToTransactions { get; set; }
 
 
     }

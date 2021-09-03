@@ -48,9 +48,9 @@ namespace Crypto_Payment_Gateway.Services
         /// <param name="isItUserWallet">if it is it use main wallet and if the money added buy user wallet address is maping it to his account</param>
         /// <param name="userWallet"></param>
         /// <returns> model for showing the user the wallet and end time </returns>
-        public Task<AccountingIncreaseBalance> UserIncreaseBalanceRequest(Currency currency, float amount, SiteUser siteUser, string transactionHash, bool isItUserWallet, string userWallet);
+        public Task<AccountingIncreaseBalance> UserIncreaseBalanceRequest(Currency currency, float amount, SiteUser siteUser, string userWallet = "");
 
-        public Task<int> CheckingWaitingWalletTransaction(bool IsInMainWallet, DateTime startedTime, DateTime endTime, bool IsDeleted = false, SiteUser siteUser = null);
+        public Task<ICollection<AccountingAddTransaction>> CheckingWaitingWalletTransaction();
 
         public Task AddWallet(Wallet wallet);
 

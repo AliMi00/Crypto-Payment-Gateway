@@ -15,5 +15,6 @@ namespace Crypto_Payment_Gateway.Models.DbModels
         InternalSell,
         InternalReward,
         CryptoWithdraw,
+        Temp
     }
 }

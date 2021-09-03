@@ -23,7 +23,7 @@ namespace Crypto_Payment_Gateway.Controllers
         public async Task<IActionResult> GetTransactions()
         {
 
-            ICollection<WalletTransaction> walletTransactions = await accountingServices.AddWalletTransactions(DateTime.Now, Models.Enums.Currency.USDTerc20);
+            ICollection<WalletTransaction> walletTransactions = await accountingServices.AddWalletTransactions(Models.Enums.Currency.USDTerc20);
 
 
             return Json(walletTransactions);
