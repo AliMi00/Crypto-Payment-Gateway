@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Crypto_Payment_Gateway.Models.DbModels;
+using Crypto_Payment_Gateway.Models.Enums;
+using Crypto_Payment_Gateway.Models.InternalModels;
 
 namespace Crypto_Payment_Gateway.Services
 {
@@ -56,5 +58,20 @@ namespace Crypto_Payment_Gateway.Services
         /// </summary>
         /// <returns></returns>
         Task DisableCoupon();
+
+        ICollection<Transactions> GetAllTransactions(DateTime startDate, DateTime endDate);
+
+        ICollection<Wallet> GetWallets(Currency currency = Currency.Other);
+
+        ICollection<WalletTransaction> GetWalletTransactions(DateTime startDate, DateTime endDate);
+
+        ICollection<Withdraw> GetWithdrawsRequest(WithdrawStatus status);
+
+        Task<GeneralResponse> AddWallet(Wallet wallet);
+
+        GeneralResponse ModifyWithdrawsResquest(Withdraw withdraw);
+
+        GeneralResponse ModifyWallet(Wallet wallet);
+
     }
 }
