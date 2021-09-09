@@ -39,7 +39,7 @@ namespace Crypto_Payment_Gateway.Services
         Task<bool> UserWithdrawRequest(SiteUser siteUser,float withdrawAmount);
 
         /// <summary>
-        /// for adding balance we use this func 
+        /// for depositing Basically this method add waiting wallet tran and return address and end time amount is important for deposit 
         /// </summary>
         /// <param name="currency"></param>
         /// <param name="amount"></param>
@@ -50,11 +50,29 @@ namespace Crypto_Payment_Gateway.Services
         /// <returns> model for showing the user the wallet and end time </returns>
         public Task<AccountingIncreaseBalance> UserIncreaseBalanceRequest(Currency currency, float amount, SiteUser siteUser, string userWallet = "");
 
+        /// <summary>
+        /// checking waiting wallet tran with wallet confirmed tran and if finds mach add to transactions using AddtransactionIncrease
+        /// </summary>
+        /// <returns> return list of resposes of increase transaction </returns>
         public Task<ICollection<AccountingAddTransaction>> CheckingWaitingWalletTransaction();
 
-        public Task AddWallet(Wallet wallet);
 
+        /// <summary>
+        /// search ad get data from api and add wallet transactions to db
+        /// </summary>
+        /// <param name="currency"></param>
+        /// <returns>List of wallet transactions that been added to db </returns>
         public Task<ICollection<WalletTransaction>> AddWalletTransactions(Currency currency);
+
+        /// <summary>
+        /// get transaction of user in time or all the data 
+        /// </summary>
+        /// <param name="siteUser"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="transactionCount"> number of record that been returned </param>
+        /// <returns></returns>
+        public ICollection<Transactions> GetUserTransactions(SiteUser siteUser, DateTime? startDate, DateTime? endDate, int transactionCount);
 
 
 

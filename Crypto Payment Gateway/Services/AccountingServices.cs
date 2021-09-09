@@ -266,6 +266,7 @@ namespace Crypto_Payment_Gateway.Services
                                 walletTransaction.IsAddedToTransactions = true;
 
                             }
+                            resposes.Add(response);
                         }
                         //TODO: need to add some functions for whithdrow transactions
                     }
@@ -300,7 +301,25 @@ namespace Crypto_Payment_Gateway.Services
             }
             return walletTransactions;
         }
-        
+
+        public ICollection<Transactions> GetUserTransactions(SiteUser siteUser, DateTime? startDate, DateTime? endDate,int transactionCount)
+        {
+            SiteUser user = db.SiteUsers.Where(x => x.Id == siteUser.Id).SingleOrDefault();
+            if (user.UserStatus != UserStatus.Active)
+            {
+                throw new Exception("User is not Active");
+            }
+            if (startDate == null || endDate == null)
+            {
+                return db.Transactions.Where(x => x.User == siteUser).OrderByDescending(x => x.Date).Take(transactionCount).ToList();
+            }
+            else
+            {
+                return db.Transactions.Where(x => x.User == siteUser && startDate <= x.Date && x.Date <= endDate).OrderByDescending(x => x.Date).Take(transactionCount).ToList();
+            }
+        }
+
+        #region internal methods
         //for USDT ERC20 get transactions and add to db  ok
         private async Task<ICollection<WalletTransaction>> GetUSDTerc20Transactions(ICollection<Wallet> wallets)
         {
@@ -458,12 +477,6 @@ namespace Crypto_Payment_Gateway.Services
 
         }
         
-        public async Task AddWallet(Wallet wallet)
-        {
-            await db.Wallets.AddAsync(wallet);
-            await db.SaveChangesAsync(true);
-        }
-
         private static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
@@ -471,6 +484,13 @@ namespace Crypto_Payment_Gateway.Services
             dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dateTime;
         }
+
+        #endregion
+
+        #region test perposes
+
+        #endregion
+
 
     }
 }
