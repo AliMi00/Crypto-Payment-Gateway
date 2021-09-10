@@ -1,4 +1,6 @@
 using Crypto_Payment_Gateway_MVC.Data;
+using Crypto_Payment_Gateway_MVC.Models.DbModels;
+using Crypto_Payment_Gateway_MVC.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,13 +29,52 @@ namespace Crypto_Payment_Gateway_MVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDatabaseDeveloperPageExceptionFilter();
+            string ConnectionString = "";
+#if DEBUG
+            ConnectionString = Configuration.GetConnectionString("ConnectionStringDebug");
+#else
+            ConnectionString = Configuration.GetConnectionString("ConnectionStringRelease");
+#endif
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(ConnectionString));
+
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddDefaultIdentity<SiteUser>(options =>
+            {
+                //reduce security for development 
+                //TODO : change before release 
+                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+                options.User.RequireUniqueEmail = false;
+
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 1;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+
+            })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("RequireManagerRole", policy => policy.RequireRole("Manager"));
+
+            });
+
+            
+
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+            //services 
+            services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
+            services.AddTransient<IAdminServices, AdminServices>();
+            services.AddTransient<IAccountingServices, AccountingServices>();
+
             services.AddControllersWithViews();
         }
 
