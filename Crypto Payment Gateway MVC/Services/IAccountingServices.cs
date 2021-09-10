@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Crypto_Payment_Gateway_MVC.Models.DbModels;
 using Crypto_Payment_Gateway_MVC.Models.Enums;
 using Crypto_Payment_Gateway_MVC.Models.InternalModels;
+using Crypto_Payment_Gateway_MVC.Models.ViewModels;
 
 namespace Crypto_Payment_Gateway_MVC.Services
 {
@@ -72,7 +73,7 @@ namespace Crypto_Payment_Gateway_MVC.Services
         /// <param name="endDate"></param>
         /// <param name="transactionCount"> number of record that been returned </param>
         /// <returns></returns>
-        public ICollection<Transactions> GetUserTransactions(SiteUser siteUser, DateTime? startDate, DateTime? endDate, int transactionCount);
+        public ICollection<TransactionView> GetUserTransactions(SiteUser siteUser, DateTime? startDate, DateTime? endDate, int transactionCount);
 
 
 

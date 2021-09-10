@@ -13,6 +13,7 @@ using Crypto_Payment_Gateway_MVC.Models.DbModels.Enums;
 using Crypto_Payment_Gateway_MVC.Models.Enums;
 using Crypto_Payment_Gateway_MVC.Models.InternalModels;
 using System.Globalization;
+using Crypto_Payment_Gateway_MVC.Models.ViewModels;
 
 namespace Crypto_Payment_Gateway_MVC.Services
 {
@@ -302,7 +303,7 @@ namespace Crypto_Payment_Gateway_MVC.Services
             return walletTransactions;
         }
 
-        public ICollection<Transactions> GetUserTransactions(SiteUser siteUser, DateTime? startDate, DateTime? endDate,int transactionCount)
+        public ICollection<TransactionView> GetUserTransactions(SiteUser siteUser, DateTime? startDate, DateTime? endDate,int transactionCount)
         {
             SiteUser user = db.SiteUsers.Where(x => x.Id == siteUser.Id).SingleOrDefault();
             if (user.UserStatus != UserStatus.Active)
@@ -311,11 +312,38 @@ namespace Crypto_Payment_Gateway_MVC.Services
             }
             if (startDate == null || endDate == null)
             {
-                return db.Transactions.Where(x => x.User == siteUser).OrderByDescending(x => x.Date).Take(transactionCount).ToList();
+                return 
+                    db.Transactions.Where(x => x.User == siteUser)
+                        .OrderByDescending(x => x.Date)
+                        .Take(transactionCount)
+                        .Select(x => new TransactionView()
+                        {
+                            AmountInUsd = x.AmountInUsd,
+                            AmountOriginal = x.AmountOriginal,
+                            Currency = x.Currency,
+                            Date = x.Date,
+                            Id = x.Id.ToString(),
+                            TransactionType = x.TransactionType
+                        })
+                        .ToList();
             }
             else
             {
-                return db.Transactions.Where(x => x.User == siteUser && startDate <= x.Date && x.Date <= endDate).OrderByDescending(x => x.Date).Take(transactionCount).ToList();
+                return
+                    db.Transactions
+                    .Where(x => x.User == siteUser && startDate <= x.Date && x.Date <= endDate)
+                    .OrderByDescending(x => x.Date)
+                    .Take(transactionCount)
+                    .Select(x => new TransactionView()
+                    {
+                        AmountInUsd = x.AmountInUsd,
+                        AmountOriginal = x.AmountOriginal,
+                        Currency = x.Currency,
+                        Date = x.Date,
+                        Id = x.Id.ToString(),
+                        TransactionType = x.TransactionType
+                    })
+                    .ToList();
             }
         }
 
