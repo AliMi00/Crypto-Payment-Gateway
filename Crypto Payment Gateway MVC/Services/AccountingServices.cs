@@ -185,7 +185,7 @@ namespace Crypto_Payment_Gateway_MVC.Services
             }
             foreach (Wallet _wallet in wallets)
             {
-                //TODO: get this from db 0.5f
+                //TODO: get this from db 0.5f this has to be diffrent in coin to coin 
                 if (!db.WaitingWalletTransactions.Any(x => x.ReciveWallet == _wallet && !x.IsDeleted && amount - 0.5f < x.Amount && x.Amount < amount + 0.5f))
                 {
                     wallet = _wallet;
@@ -347,7 +347,26 @@ namespace Crypto_Payment_Gateway_MVC.Services
             }
         }
 
-        #region internal methods
+        public ICollection<WalletViewModel> GetAvailablecurrencyWallet()
+        {
+            IList<WalletViewModel> wallets =
+                db.Wallets.Where(x => x.IsAvailable)
+                .Select(x => new WalletViewModel()
+                {
+                    Currency = x.Currency,
+                    Id = x.Id,
+                    IsAvailable = x.IsAvailable,
+                    ReleaseDate = x.ReleaseDate,
+                    WalletAddress = x.WalletAddress
+                })
+                .ToList();
+
+            return wallets;
+
+
+        }
+
+        #region internal methods for reading directly from crypto network scaner
         //for USDT ERC20 get transactions and add to db  ok
         private async Task<ICollection<WalletTransaction>> GetUSDTerc20Transactions(ICollection<Wallet> wallets)
         {
@@ -514,6 +533,13 @@ namespace Crypto_Payment_Gateway_MVC.Services
         }
 
         #endregion
+
+        #region internal methods read from exchange with exchange api
+
+
+
+        #endregion
+
 
         #region test perposes
 

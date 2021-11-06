@@ -75,6 +75,12 @@ namespace Crypto_Payment_Gateway_MVC.Services
         /// <returns></returns>
         public ICollection<TransactionView> GetUserTransactions(SiteUser siteUser, DateTime? startDate, DateTime? endDate, int transactionCount);
 
+        /// <summary>
+        /// this method returns available walletallets that is not flaged with notAvailable  
+        /// </summary>
+        /// <returns> walletViewModel</returns>
+        public ICollection<WalletViewModel> GetAvailablecurrencyWallet();
+
 
 
     }
