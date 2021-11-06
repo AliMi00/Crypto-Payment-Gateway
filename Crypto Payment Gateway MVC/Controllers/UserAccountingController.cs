@@ -41,7 +41,7 @@ namespace Crypto_Payment_Gateway_MVC.Controllers
         }
 
         //show deposit page for amount and currency
-        public async Task<IActionResult> GetDeposit()
+        public async Task<IActionResult> Deposit()
         {
             SiteUser siteUser = await userManager.GetUserAsync(User);
 
@@ -51,7 +51,7 @@ namespace Crypto_Payment_Gateway_MVC.Controllers
         }
 
         //request for deposit by user
-        public async Task<IActionResult> GetRequestDeposit(Currency currency,float amount)
+        public async Task<IActionResult> DepositRequest(Currency currency,float amount)
         {
             SiteUser siteUser = await userManager.GetUserAsync(User);
 

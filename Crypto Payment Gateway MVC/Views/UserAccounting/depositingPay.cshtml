@@ -1,0 +1,16 @@
+﻿@model Crypto_Payment_Gateway_MVC.Models.ViewModels.RequestDepositingViewModel
+
+
+
+@{
+    ViewData["Title"] = "depositingPay";
+}
+
+<h1>depositingPay</h1>
+<h5>you are should depositing exaclly @Model.Amount</h5>
+<h2>you have 15 minutes to depositing to this address started time is @Model.StartedTime.ToLocalTime()</h2>
+
+<input id="text" type="text" value=@Model.ReciveWallet style="width:30%" />
+<br />
+<div id="qrcode"></div>
+
