@@ -177,7 +177,7 @@ namespace Crypto_Payment_Gateway_MVC.Services
         
             ICollection<Wallet> wallets = db.Wallets.Where(x => x.IsAvailable && x.Currency == currency).ToList();
             //wallet = db.Wallets.Where(x => x.IsAvailable && x.Currency == currency).FirstOrDefault();
-            if (wallets.Count > 0 )
+            if (wallets.Count <= 0 )
             {
                 result.Message = "There is no wallet right now to add try again later";
                 result.Error = true;
@@ -221,6 +221,7 @@ namespace Crypto_Payment_Gateway_MVC.Services
             result.ReciveWallet = wallet.WalletAddress;
             result.StartedTime = DateTime.Now;
             result.SenderWallet = userWallet;
+            result.Currency = currency;
 
             return result;
         }

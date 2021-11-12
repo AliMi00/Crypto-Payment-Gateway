@@ -12,5 +12,6 @@ namespace Crypto_Payment_Gateway_MVC.Models.ViewModels
         public float Amount { get; set; }
         public bool Error { get; set; }
         public string Message { get; set; }
+        public string Currency { get; set; }
     }
 }

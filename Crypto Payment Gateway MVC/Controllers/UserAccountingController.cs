@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 namespace Crypto_Payment_Gateway_MVC.Controllers
 {
     [Authorize]
+    [Route("user/wallet/[action]")]
+    [Route("user/wallet/")]
     public class UserAccountingController : Controller
     {
         private readonly ILogger<UserAccountingController> logger;
@@ -31,7 +33,9 @@ namespace Crypto_Payment_Gateway_MVC.Controllers
         {
             return View();
         }
+
         //get user transactions
+        [HttpGet("Transactions")]
         public async Task<IActionResult> GetTransactions()
         {
             SiteUser siteUser = await userManager.GetUserAsync(User);
@@ -59,8 +63,13 @@ namespace Crypto_Payment_Gateway_MVC.Controllers
 
             if (increaseBalance.Error)
             {
-                //change for showing error page
-                return null;
+                //showing error page with massage 
+                RequestDepositingViewModel model = new RequestDepositingViewModel()
+                {
+                    Error = increaseBalance.Error,
+                    Message = increaseBalance.Message,
+                };
+                return View("DepositRequestError", model);
             }
             else if (!increaseBalance.Error)
             {
@@ -70,11 +79,13 @@ namespace Crypto_Payment_Gateway_MVC.Controllers
                     Error = increaseBalance.Error,
                     Message = increaseBalance.Message,
                     ReciveWallet = increaseBalance.ReciveWallet,
-                    StartedTime = increaseBalance.StartedTime
+                    StartedTime = increaseBalance.StartedTime,
+                    Currency = increaseBalance.Currency.ToString()
+                    
                 };
                 return View("DepositingPay", model);
             }
-            return null;
+            return View("Error");
         }
         
 
