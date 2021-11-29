@@ -11,7 +11,7 @@ namespace Crypto_Payment_Gateway_MVC.Services
     /// <summary>
     /// this service should only use in controllers with admin privilages
     /// </summary>
-    public interface IAdminServices
+    public interface IAdminGeneralServices
     {
         /// <summary>
         /// upgrade user or add user to Manager role only use in 
@@ -59,7 +59,7 @@ namespace Crypto_Payment_Gateway_MVC.Services
         /// <returns></returns>
         Task DisableCoupon();
 
-        ICollection<Transactions> GetAllTransactions(DateTime startDate, DateTime endDate);
+        ICollection<Transactions> GetAllTransactions(DateTime startDate, DateTime endDate, SiteUser siteUser = null);
 
         ICollection<Wallet> GetWallets(Currency currency = Currency.Other);
 

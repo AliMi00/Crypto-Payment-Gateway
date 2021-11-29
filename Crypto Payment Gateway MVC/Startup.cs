@@ -75,7 +75,7 @@ namespace Crypto_Payment_Gateway_MVC
             services.AddRazorPages();
             //services 
             services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
-            services.AddTransient<IAdminServices, AdminServices>();
+            services.AddTransient<IAdminGeneralServices, AdminGeneralServices>();
             services.AddTransient<IAccountingServices, AccountingServices>();
 
             services.AddControllersWithViews();

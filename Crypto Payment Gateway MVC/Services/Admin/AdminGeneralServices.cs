@@ -13,14 +13,14 @@ using Crypto_Payment_Gateway_MVC.Models.InternalModels;
 
 namespace Crypto_Payment_Gateway_MVC.Services
 {
-    public class AdminServices: IAdminServices
+    public class AdminGeneralServices: IAdminGeneralServices
     {
         private readonly IApplicationDbContext db;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly ILogger<AdminServices> logger;
+        private readonly ILogger<AdminGeneralServices> logger;
         private readonly UserManager<SiteUser> UserManager;
 
-        public AdminServices(IApplicationDbContext db, IWebHostEnvironment webHostEnvironment, ILogger<AdminServices> _logger, IServiceProvider serviceProvider)
+        public AdminGeneralServices(IApplicationDbContext db, IWebHostEnvironment webHostEnvironment, ILogger<AdminGeneralServices> _logger, IServiceProvider serviceProvider)
         {
             this.db = db;
             this.webHostEnvironment = webHostEnvironment;
@@ -28,15 +28,11 @@ namespace Crypto_Payment_Gateway_MVC.Services
             UserManager = serviceProvider.GetRequiredService<UserManager<SiteUser>>();
         }
 
+        #region game and other selling stuff
+
         public Task AddDataToFrontPage()
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<bool> AddUserToManager(SiteUser siteUser)
-        {
-            var result = await UserManager.AddToRoleAsync(siteUser, "Manager");
-            return result.Succeeded;
         }
 
         public Task CreateCoupon()
@@ -63,10 +59,33 @@ namespace Crypto_Payment_Gateway_MVC.Services
         {
             throw new NotImplementedException();
         }
-        //TODO: probebly need modififactions
-        public ICollection<Transactions> GetAllTransactions(DateTime startDate, DateTime endDate)
+
+        #endregion
+
+
+
+        public async Task<bool> AddUserToManager(SiteUser siteUser)
         {
-            ICollection<Transactions> transactions = db.Transactions.Where(x => x.Date >= startDate && x.Date <= endDate).ToList();
+            var result = await UserManager.AddToRoleAsync(siteUser, "Manager");
+            return result.Succeeded;
+        }
+        //TODO: probebly need modififactions
+        public ICollection<Transactions> GetAllTransactions(DateTime startDate, DateTime endDate,SiteUser siteUser = null)
+        {
+            ICollection<Transactions> transactions;
+
+            if (siteUser == null)
+            {
+                transactions = db.Transactions.Where(x => x.Date >= startDate && x.Date <= endDate).ToList();
+            }
+            else if(siteUser != null)
+            {
+                transactions = db.Transactions.Where(x => x.Date >= startDate && x.Date <= endDate && x.User == siteUser).ToList();
+            }
+            else
+            {
+                transactions = new List<Transactions>();
+            }
 
             return transactions;
         }

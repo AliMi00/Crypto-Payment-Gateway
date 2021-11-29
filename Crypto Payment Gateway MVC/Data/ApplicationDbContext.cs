@@ -6,6 +6,7 @@ using System.Text;
 using Crypto_Payment_Gateway_MVC.Models.DbModels;
 using System.Threading;
 using System.Threading.Tasks;
+using Crypto_Payment_Gateway_MVC.Models.ViewModels;
 
 
 
@@ -45,5 +46,7 @@ namespace Crypto_Payment_Gateway_MVC.Data
         {
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
+        public DbSet<Crypto_Payment_Gateway_MVC.Models.ViewModels.AddWalletViewModel> AddWalletViewModel { get; set; }
+        public DbSet<Crypto_Payment_Gateway_MVC.Models.ViewModels.WalletViewModel> WalletViewModel { get; set; }
     }
 }
